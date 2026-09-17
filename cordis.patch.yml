@@ -1,0 +1,13 @@
+# DeepSeek Harness 插件配置 - 小禾画布
+# 此文件由 dsh.bundle.patch 引用，安装插件时自动加载
+
+- insert:
+    - id: xiaohe-canvas
+      name: 'xiaohe-canvas-dsh'
+      config:
+        # Canvas Agent HTTP API 地址
+        apiUrl: 'http://127.0.0.1:17371'
+        # 连接超时（毫秒）
+        timeout: 30000
+        # 是否自动启动 Canvas Agent（如果未运行）
+        autoStartAgent: true
