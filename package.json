@@ -1,33 +1,7 @@
 {
   "name": "xiaohe-canvas-dsh",
-  "version": "0.1.0",
-  "description": "DeepSeek Harness 插件 - 小禾画布 AI 创作助手",
-  "type": "module",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "files": [
-    "lib",
-    "skills",
-    "cordis.patch.yml",
-    "README.md",
-    "LICENSE"
-  ],
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "default": "./lib/index.js"
-    },
-    "./cordis.patch.yml": "./cordis.patch.yml",
-    "./package.json": "./package.json"
-  },
-  "engines": {
-    "node": ">=22.18.0"
-  },
-  "dsh": {
-    "bundle": {
-      "patch": "cordis.patch.yml"
-    }
-  },
+  "version": "0.1.1",
+  "description": "DeepSeek Harness plugin for Xiaohe Canvas: AI-powered e-commerce content creation (images, videos, workflows).",
   "keywords": [
     "dsh-plugin",
     "deepseek-harness",
@@ -35,24 +9,53 @@
     "ai-canvas",
     "mcp"
   ],
+  "license": "MIT",
+  "author": "xiaohe",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wild-River2016/xiaohe-canvas-dsh.git"
+  },
+  "homepage": "https://github.com/wild-River2016/xiaohe-canvas-dsh#readme",
+  "bugs": {
+    "url": "https://github.com/wild-River2016/xiaohe-canvas-dsh/issues"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "skills",
+    "cordis.patch.yml"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": "*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.5.0"
   },
-  "peerDependencies": {
-    "@deepseek-ai/cordis": "*",
-    "@deepseek-ai/dsh-tools": "*"
-  },
-  "author": "xiaohe",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wild-River2016/xiaohe-canvas-dsh.git"
-  },
-  "homepage": "https://github.com/wild-River2016/xiaohe-canvas-dsh#readme"
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
 }
