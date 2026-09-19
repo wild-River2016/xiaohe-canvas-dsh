@@ -83,3 +83,6 @@ dsh plugin --profile web remove xiaohe-canvas-dsh
 ## 许可证
 
 MIT
+
+---
+Last updated: 2026-09-19 02:20 UTC
