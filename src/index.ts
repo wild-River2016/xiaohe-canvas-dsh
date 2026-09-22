@@ -58,6 +58,7 @@ async function startCanvasAgent(dshToken?: string): Promise<void> {
     
     canvasAgentProcess = spawn(npxCmd, args, {
       stdio: ['ignore', 'pipe', 'pipe'],
+      shell: true,  // Windows + Node 24 需要 shell: true 才能执行 .cmd 文件
     })
     
     let started = false
