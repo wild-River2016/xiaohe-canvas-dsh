@@ -69,8 +69,10 @@ export const toolDefinitions: ToolDefinition[] = [
 - video - 视频节点，用于生成视频（180×220）
 
 **提示词位置**：
-提示词直接放在目标节点的 metadata.prompt 里，不要创建单独文本节点：
-{"type":"image","title":"穿着效果","metadata":{"prompt":"8岁小男孩穿着 @服装图 中的服装..."}}
+- 图片/视频节点：提示词放在 metadata.prompt
+- 文本节点：内容放在 metadata.content（不是 prompt）
+示例：{"type":"image","title":"穿着效果","metadata":{"prompt":"8岁小男孩穿着..."}}
+示例：{"type":"text","title":"分镜脚本","metadata":{"content":"镜头1：开场..."}}
 
 **便签内容要详细**，说明具体操作步骤：
 {"type":"sticker","metadata":{"content":"【第一步：上传素材】\\n在下方图片框中上传你的服装平铺图\\n建议白底、服装展开、高清图片","stickerTheme":"yellow"}}
@@ -86,7 +88,19 @@ export const toolDefinitions: ToolDefinition[] = [
 - 层间距（水平）：350px
 - 同层节点间距（垂直）：240px（220高度+20间距）
 - 便签在该阶段第一个节点正上方，y 间距 10px
-- 便签的 x 坐标 = 该阶段节点的 x 坐标（便签间距自然为 350px）`,
+- 便签的 x 坐标 = 该阶段节点的 x 坐标（便签间距自然为 350px）
+
+**坐标示例**（6套服装工作流）：
+第1步 x=50：便签(x=50,y=10)，模特(x=50,y=120)
+第2步 x=400：便签(x=400,y=10)，服装1-6(x=400,y=120,360,600,840,1080,1320)
+第3步 x=750：便签(x=750,y=10)，场景(x=750,y=120)
+第4步 x=1100：便签(x=1100,y=10)，穿版图1-6(x=1100,y=120,360,600,840,1080,1320)
+第5步 x=1450：便签(x=1450,y=10)，参考视频(x=1450,y=120)
+第6步 x=1800：便签(x=1800,y=10)，输出视频(x=1800,y=120)
+
+**视口设置**：
+- 节点较少时：{"x":20,"y":20,"k":1}
+- 节点较多（高度超800）时：{"x":20,"y":80,"k":0.6} 或更小`,
     parameters: {
       ops: {
         type: 'array',
@@ -341,7 +355,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'workbench_image_generate',
-    description: '在生图工作台填入提示词并按需设置 model、quality、size、count，run 默认 true 会自动点击生成按钮。会自动跳转到生图工作台。生成为异步过程，提交后返回 taskId。',
+    description: '在生图工作台填入提示词并按需设置 model、quality、size（如 1:1 或 1024x1024）、count，run 默认 true 会自动点击生成按钮。会自动跳转到生图工作台。生成为异步过程，提交后返回 taskId，可用 generation_get_status 查询状态。',
     parameters: {
       prompt: { type: 'string', required: true, description: '提示词' },
       model: { type: 'string', description: '模型' },
@@ -358,7 +372,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'workbench_video_generate',
-    description: '在视频创作台填入提示词并按需设置 model、size、seconds、resolution、generateAudio、watermark，run 默认 true 会自动点击生成按钮。会自动跳转到视频创作台。',
+    description: '在视频创作台填入提示词并按需设置 model、size、seconds、resolution、generateAudio、watermark，run 默认 true 会自动点击生成按钮。会自动跳转到视频创作台。生成为异步过程，提交后返回 taskId，可用 generation_get_status 查询状态。',
     parameters: {
       prompt: { type: 'string', required: true, description: '提示词' },
       model: { type: 'string', description: '模型' },
@@ -387,7 +401,7 @@ export const toolDefinitions: ToolDefinition[] = [
   // ========== 素材库 ==========
   {
     name: 'assets_list',
-    description: '列出用户「我的素材」，支持 kind（text/image/video）过滤、keyword 搜索和 page/pageSize 分页。',
+    description: '列出用户「我的素材」，支持 kind（text/image/video）过滤、keyword 搜索和 page/pageSize 分页。为控制体积不返回图片/视频原始 data，仅返回封面与元信息。',
     parameters: {
       kind: { type: 'string', enum: ['all', 'text', 'image', 'video'], description: '素材类型' },
       keyword: { type: 'string', description: '搜索关键词' },
@@ -424,10 +438,19 @@ export const toolDefinitions: ToolDefinition[] = [
 3. 分析各模板的工作流程差异（节点类型、处理阶段）
 4. 用流程箭头展示各方案，让用户选择数字
 
+**回复格式示例**：
+有 3 种方案：
+1.（5节点）：上传服装 → 生成穿版图 → 生成视频
+2.（7节点）：上传服装+场景 → 场景融合 → 生成视频
+3.（21节点）：固定模特+6套服装+场景 → 6张穿版图 → 换装视频
+你想用哪个？回复 1、2 或 3
+
 **展示规则**：
 - ❌ 不要说"找到几个模板"
-- ❌ 不要展示原始模板名称
-- ✅ 用自己的语言描述模板特点和适用场景`,
+- ❌ 不要展示原始模板名称（爬取数据，可能不通顺）
+- ❌ 不要展示查看量、解锁量等内部数据
+- ✅ 用自己的语言描述模板特点和适用场景
+- ✅ 如果只有一个合适的模板，直接推荐并询问是否创建`,
     parameters: {
       query: { type: 'string', description: '搜索关键词' },
       category: { type: 'string', description: '分类' },
@@ -439,12 +462,25 @@ export const toolDefinitions: ToolDefinition[] = [
     name: 'templates_get',
     description: `获取模板详情，含完整画布数据（graph）。返回的 graph 为外部平台格式。
 
+**模板创作原则**：
+- 模板是参考，不是终点
+- 分析模板的结构和逻辑，结合用户的具体产品和场景生成定制化内容
+
 **基于模板创建工作流的步骤**：
 1. 解析 graph 字段的 JSON
 2. 分析模板结构：节点数量、类型分布、连线关系、工作流阶段
-3. 保留模板的核心工作流结构，不要过度简化
-4. 根据用户需求调整提示词内容
-5. 添加便签说明每个步骤的操作方法`,
+3. 保留模板的核心工作流结构（节点数量和连线逻辑），不要过度简化
+4. 根据用户需求调整提示词内容（如风格、场景、产品特点）
+5. 添加便签说明每个步骤的操作方法
+
+**禁止过度简化**：
+- 模板有 7 个节点，创建的工作流也应该有相近数量的节点
+- 模板有多阶段处理（如：原图→平铺图→模特图→合成→视频），必须保留这些阶段
+- 不能把复杂工作流简化成"上传→生成→完成"的简单三步
+
+**两种场景**：
+1. 用户需求明确 → 基于模板结构，定制提示词生成工作流
+2. 用户需求不明确 → 使用 templates_import_to_canvas 直接导入模板`,
     parameters: {
       id: { type: 'string', required: true, description: '模板 ID' },
     },
@@ -456,7 +492,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'templates_import_to_canvas',
-    description: '将模板导入当前画布。会自动转换格式并在指定位置创建模板中的所有节点和连线。仅在用户明确说「导入」时使用。',
+    description: '将模板导入当前画布。会自动转换格式并在指定位置（默认画布右侧）创建模板中的所有节点和连线。仅在用户明确说「导入」时使用。',
     parameters: {
       id: { type: 'string', required: true, description: '模板 ID' },
       x: { type: 'number', description: 'x 坐标' },

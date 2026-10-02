@@ -1,6 +1,6 @@
 {
   "name": "xiaohe-canvas-dsh",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "DeepSeek Harness plugin for Xiaohe Canvas: AI-powered e-commerce content creation (images, videos, workflows).",
   "keywords": [
     "dsh-plugin",
